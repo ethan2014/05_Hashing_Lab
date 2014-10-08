@@ -74,6 +74,7 @@ private:
 
 	unsigned long numItems; //Number of items in the hash table
 
+	// used to determine which prime number to use as array size
 	unsigned long primesCount;
 
 	//Note: Ordinarily, these OUGHT to be private. In this case I have
@@ -82,10 +83,6 @@ public:
 	unsigned long numRemoved; //Number of slots that have been removed but not re-used. Those that have isDel == true
 	unsigned long backingArraySize;
 };
-
-//You will need this so you can make a string to throw in
-// remove
-
 
 template <class Key, class T>
 HashTable<Key,T>::HashTable()
