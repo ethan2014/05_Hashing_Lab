@@ -106,7 +106,17 @@ HashTable<Key,T>::~HashTable()
 template <class Key, class T>
 unsigned long HashTable<Key,T>::calcIndex(Key k)
 {
-	return hash(k) % backingArraySize;
+	unsigned long int i = hash(k) % backingArraySize;
+
+	while (!backingArray[i].isNull) {
+		if (!backingArray[i].isDel && backingArray[i].k == k) {
+			return i;
+		}
+
+		i = (i + 1) % backingArraySize;
+	}
+	
+	return numItems; // item was not found
 }
 
 template <class Key, class T>
@@ -116,7 +126,7 @@ void HashTable<Key,T>::add(Key k, T x)
 		grow();
 	}
 
-	int i = calcIndex(k);
+	unsigned long int i = hash(k) % backingArraySize;
 
 	while (!backingArray[i].isNull && !backingArray[i].isDel) {
 		i = (i + 1) % backingArraySize;
@@ -139,30 +149,22 @@ void HashTable<Key,T>::add(Key k, T x)
 template <class Key, class T>
 void HashTable<Key,T>::remove(Key k)
 {
-	int i = calcIndex(k);
+	unsigned long int i = calcIndex(k);
 
-	while (!backingArray[i].isNull) {
-		if (!backingArray[i].isDel && backingArray[i].k == k) {
-			backingArray[i].isDel = true;
-			numItems--;
-			numRemoved++;
-		}
-
-		i = (i + 1) % backingArraySize;
+	if (i != numItems) {
+		backingArray[i].isDel = true;
+		numItems--;
+		numRemoved++;
 	}
 }
 
 template <class Key, class T>
 T HashTable<Key,T>::find(Key k)
 {
-	int i = calcIndex(k);
+	unsigned long int i = calcIndex(k);
 
-	while (!backingArray[i].isNull) {
-		if (!backingArray[i].isDel && backingArray[i].k == k) {
-			return backingArray[i].x;
-		}
-
-		i = (i + 1) % backingArraySize;
+	if (i != numItems) {
+		return backingArray[i].x;
 	}
 
 	throw std::string("error: invalid key used in find() method");
@@ -171,17 +173,13 @@ T HashTable<Key,T>::find(Key k)
 template <class Key, class T>
 bool HashTable<Key,T>::keyExists(Key k)
 {
-	int i = calcIndex(k);
+	unsigned long int i = calcIndex(k);
 
-	while (!backingArray[i].isNull) {
-		if (!backingArray[i].isDel && backingArray[i].k == k) {
-			return true;
-		}
-
-		i = (i + 1) % backingArraySize;
+	if (i == numItems) {
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 template <class Key, class T>
@@ -200,10 +198,11 @@ void HashTable<Key,T>::grow()
 	HashRecord *new_arr = new HashRecord[new_size];
 
 	backingArraySize = new_size;
+	numRemoved = 0;
 
 	for (int i = 0; i < old_size; i++) {
 		if (!backingArray[i].isNull && !backingArray[i].isDel) {
-			int h = calcIndex(backingArray[i].k);
+			int h = hash(backingArray[i].k) % backingArraySize;
 
 			while (!new_arr[h].isNull) {
 				h = (h + 1) % new_size;
@@ -215,9 +214,6 @@ void HashTable<Key,T>::grow()
 			new_arr[h].isDel = false;
 		}
 	}
-
-	backingArraySize = new_size;
-	numRemoved = 0;
 
 	delete[] backingArray;
 	backingArray = new_arr;

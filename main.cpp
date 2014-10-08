@@ -8,13 +8,13 @@ unsigned long hash(std::string k);
 #include "HashTable.h"
 
 /**
-* This is a hash function for strings, based on Horner's method. See
-* http://en.wikipedia.org/wiki/Horner's_method
-*
-* If you want to use the HashTable class with a different Key type, then
-* you would need to overload the hash() function, creating a version
-* with the appropriate input type.
-*/
+ * This is a hash function for strings, based on Horner's method. See
+ * http://en.wikipedia.org/wiki/Horner's_method
+ *
+ * If you want to use the HashTable class with a different Key type, then
+ * you would need to overload the hash() function, creating a version
+ * with the appropriate input type.
+ */
 unsigned long hash(std::string k)
 {
 	unsigned long m = hashPrimes[NUM_HASH_PRIMES-2];
@@ -125,9 +125,10 @@ void testBasicMethods(){
 		return;
 	}
 
+
 	if(testHash.keyExists("brown") && testHash.keyExists("cow") &&
-		testHash.keyExists("metal") && testHash.keyExists("daffodil")){
-			std::cout << "SUCCESS: The 4 items that weren't removed are still in the table." << std::endl;
+	   testHash.keyExists("metal") && testHash.keyExists("daffodil")){
+		std::cout << "SUCCESS: The 4 items that weren't removed are still in the table." << std::endl;
 	} else {
 		std::cout << "ERROR: One of the 4 keys that ought to still be in the table has been lost" << std::endl;
 		return;
