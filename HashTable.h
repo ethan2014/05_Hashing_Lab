@@ -119,11 +119,15 @@ unsigned long HashTable<Key,T>::calcIndex(Key k)
 template <class Key, class T>
 void HashTable<Key,T>::add(Key k, T x)
 {
+	if (keyExists(k)) {
+		throw std::string("error: tried to add a key that already exists");
+	}
+	
+	unsigned long int i = hash(k) % backingArraySize;
+	
 	if (2 * (numItems + numRemoved + 1) > backingArraySize) {
 		grow();
 	}
-
-	unsigned long int i = hash(k) % backingArraySize;
 
 	while (!backingArray[i].isNull && !backingArray[i].isDel) {
 		i = (i + 1) % backingArraySize;
